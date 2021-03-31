@@ -176,7 +176,26 @@ fn main() {
         assert_eq!(*r, 10)
     }
 
+    {
+        let v = vec![4, 8, 19, 27, 34, 10];
+        let r = &v;
+        assert_eq!(r[0], 4);
 
+        let _aside = v;
+    }
+
+    {
+        let mut wave = Vec::new();
+        let head = vec![0.0, 1.0];
+        let tail = [0.0, -1.0];
+
+        extend(&mut wave, &head);
+        extend(&mut wave, &tail);
+
+        assert_eq!(wave, vec![0.0, 1.0, 0.0, -1.0]);
+
+        // extend(&mut wave, &wave);
+    }
 }
 
 fn show(table: &Table) {
@@ -221,4 +240,10 @@ fn smallest<'a>(v: &'a [i32]) -> &'a i32 {
     }
 
     s
+}
+
+fn extend(vec: &mut Vec<f64>, slice: &[f64]) {
+    for elt in slice {
+        vec.push(*elt);
+    }
 }
