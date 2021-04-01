@@ -1,3 +1,4 @@
+/// Describes `Fern` with size and growth rate.
 pub struct Fern {
     pub size: f64,
     pub growth_rate: f64,
@@ -9,6 +10,8 @@ impl Fern {
     }
 }
 
+/// Simulates the growth of ferns, from the level of
+/// individual cells on up.
 pub fn run_simulation(fern: &mut Fern, days: usize) {
     for _ in 0..days {
         fern.grow();
