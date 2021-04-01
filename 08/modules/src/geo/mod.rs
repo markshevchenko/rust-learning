@@ -12,3 +12,11 @@ pub fn distance(point1: Point, point2: Point) -> f64 {
 
     (delta_x * delta_x + delta_y * delta_y).sqrt()
 }
+
+#[test]
+#[allow(non_snake_case)]
+fn distance__with_1_distance__returns_1() {
+    let actual = distance(Point { x: 0.0, y: 0.0 }, Point { x: 1.0, y: 0.0 });
+
+    assert_eq!(1.0, actual);
+}
