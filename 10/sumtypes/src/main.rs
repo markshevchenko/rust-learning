@@ -65,7 +65,6 @@ fn main() {
         assert_eq!(TimeUnit::Months.singular(), "month");
 
         #[derive(Copy, Clone, Debug, PartialEq)]
-        #[allow(dead_code)]
         enum RoughTime {
             InThePast(TimeUnit, u32),
             JustNow,
@@ -75,15 +74,34 @@ fn main() {
         let four_score_and_seven_years_ago = RoughTime::InThePast(TimeUnit::Years, 4 * 20 + 7);
         let three_hours_from_now = RoughTime::InTheFuture(TimeUnit::Hours, 3);
 
-        if let RoughTime::InThePast(unit, value) = four_score_and_seven_years_ago {
-            assert_eq!(unit, TimeUnit::Years);
-            assert_eq!(value, 87);
+        if let RoughTime::InThePast(units, count) = four_score_and_seven_years_ago {
+            assert_eq!(units, TimeUnit::Years);
+            assert_eq!(count, 87);
         }
 
-        if let RoughTime::InTheFuture(unit, value) = three_hours_from_now {
-            assert_eq!(unit, TimeUnit::Hours);
-            assert_eq!(value, 3);
+        if let RoughTime::InTheFuture(units, count) = three_hours_from_now {
+            assert_eq!(units, TimeUnit::Hours);
+            assert_eq!(count, 3);
         }
+
+        fn rough_time_to_english(rt: RoughTime) -> String {
+            match rt {
+                RoughTime::InThePast(TimeUnit::Hours, 1) => format!("an hour ago"),
+                RoughTime::InThePast(units, 1) => format!("a {} ago", units.singular()),
+                RoughTime::InThePast(units, count) => format!("{} {} ago", count, units.plural()),
+                RoughTime::JustNow => format!("just now"),
+                RoughTime::InTheFuture(TimeUnit::Hours, 1) => format!("an hour from now"),
+                RoughTime::InTheFuture(units, 1) => format!("a {} from now", units.singular()),
+                RoughTime::InTheFuture(units, count) => format!("{} {} from now", count, units.plural()),
+            }
+        }
+
+        let month_from_now = RoughTime::InTheFuture(TimeUnit::Months, 1);
+
+        assert_eq!(rough_time_to_english(four_score_and_seven_years_ago), "87 years ago");
+        assert_eq!(rough_time_to_english(RoughTime::JustNow), "just now");
+        assert_eq!(rough_time_to_english(month_from_now), "a month from now");
+        assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Hours, 1)), "an hour ago");
     }
 
     {
@@ -119,5 +137,45 @@ fn main() {
             assert_eq!(y2, 3.0);
             assert_eq!(z2, 4.0);
         }
+    }
+
+    {
+        enum BinaryTree<T> {
+            Empty,
+            NonEmpty(Box<TreeNode<T>>),
+        }
+
+        struct TreeNode<T> {
+            element: T,
+            left: BinaryTree<T>,
+            right: BinaryTree<T>,
+        }
+
+        fn tree_to_vec<T>(tree: &BinaryTree<T>, vec: &mut Vec<T>) where T: Copy {
+            if let BinaryTree::<T>::NonEmpty(node) = tree {
+                tree_to_vec(&node.left, vec);
+                vec.push(node.element);
+                tree_to_vec(&node.right, vec);
+            }
+        }
+
+        let tree = BinaryTree::NonEmpty(Box::new(TreeNode {
+            element: 3,
+            left: BinaryTree::NonEmpty(Box::new(TreeNode {
+                element: 1,
+                left: BinaryTree::Empty,
+                right: BinaryTree::Empty,
+            })),
+            right: BinaryTree::NonEmpty(Box::new(TreeNode {
+                element: 5,
+                left: BinaryTree::Empty,
+                right: BinaryTree::Empty,
+            }))
+        }));
+
+        let mut v = Vec::new();
+        tree_to_vec(&tree, &mut v);
+
+        assert_eq!(v, vec![1, 3, 5]);
     }
 }
