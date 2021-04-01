@@ -63,5 +63,61 @@ fn main() {
 
         assert_eq!(TimeUnit::Minutes.plural(), "minutes");
         assert_eq!(TimeUnit::Months.singular(), "month");
+
+        #[derive(Copy, Clone, Debug, PartialEq)]
+        #[allow(dead_code)]
+        enum RoughTime {
+            InThePast(TimeUnit, u32),
+            JustNow,
+            InTheFuture(TimeUnit, u32),
+        }
+
+        let four_score_and_seven_years_ago = RoughTime::InThePast(TimeUnit::Years, 4 * 20 + 7);
+        let three_hours_from_now = RoughTime::InTheFuture(TimeUnit::Hours, 3);
+
+        if let RoughTime::InThePast(unit, value) = four_score_and_seven_years_ago {
+            assert_eq!(unit, TimeUnit::Years);
+            assert_eq!(value, 87);
+        }
+
+        if let RoughTime::InTheFuture(unit, value) = three_hours_from_now {
+            assert_eq!(unit, TimeUnit::Hours);
+            assert_eq!(value, 3);
+        }
+    }
+
+    {
+        struct Point3d {
+            x: f32,
+            y: f32,
+            z: f32,
+        }
+
+        enum Shape {
+            Sphere { center: Point3d, radius: f32 },
+            Cuboid { corner1: Point3d, corner2: Point3d },
+        }
+
+        let shape1 = Shape::Sphere { center: Point3d { x: 0.0, y: 1.0, z: 2.0 }, radius: 0.5 };
+        let shape2 = Shape::Cuboid { corner1: Point3d { x: 0.0, y: 0.0, z: 0.0 },
+                                     corner2: Point3d { x: 2.0, y: 3.0, z: 4.0 } };
+
+        if let Shape::Sphere { center: Point3d { x, y, z }, radius } = shape1 {
+            assert_eq!(x, 0.0);
+            assert_eq!(y, 1.0);
+            assert_eq!(z, 2.0);
+            assert_eq!(radius, 0.5);
+        }
+
+        if let Shape::Cuboid { corner1: Point3d { x: x1, y: y1, z: z1 },
+                               corner2: Point3d { x: x2, y: y2, z: z2 } } = shape2 {
+            assert_eq!(x1, 0.0);
+            assert_eq!(y1, 0.0);
+            assert_eq!(z1, 0.0);
+
+            assert_eq!(x2, 2.0);
+            assert_eq!(y2, 3.0);
+            assert_eq!(z2, 4.0);
+        }
     }
 }
